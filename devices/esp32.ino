@@ -9,13 +9,13 @@
 DHT dht(DHT_PIN, DHT_TYPE);
 
 const char* ntpServer = "pool.ntp.org";
-const char* ssid = "";
-const char* pw = "";
+const char* ssid = "Nackas hörna";
+const char* pw = "Lennartskoglund";
 const char* url = "";
 const char* deviceId = "Williams DHT11";
 
 unsigned long prevMillis = 0;
-unsigned long timeDelay = 5000;
+unsigned long timeDelay = 60000;
 
 
 void setup() {
@@ -41,13 +41,15 @@ unsigned long getTime() {
   return now;
 }
 
-int httpPost(char message[256]) {
+void httpPost(char message[256]) {
   HTTPClient http;
   http.begin(url);
   http.addHeader("Content-Type", "application/json");
   int response = http.POST(message);
+  Serial.print("HTTP response: ");
+  Serial.println(response);
   http.end();
-  return response;
+  
 }
 
 char* createMessage(float temp, float hum, unsigned long unixTime) {
@@ -74,11 +76,7 @@ void loop() {
     Serial.println(unixTime);
     if (WiFi.status() == WL_CONNECTED) {
       char* message = createMessage(temp, hum, unixTime);
-      int response = httpPost(message);
-      
-      Serial.print("HTTP response: ");
-      Serial.println(response);
-
+      httpPost(message);
     }
     else{
       Serial.println("No WIFI");
