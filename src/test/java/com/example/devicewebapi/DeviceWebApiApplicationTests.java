@@ -10,4 +10,8 @@ class DeviceWebApiApplicationTests {
     void contextLoads() {
     }
 
+    @Test
+    void Test_getAllMeasurements(){
+
+    }
 }
