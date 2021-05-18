@@ -9,9 +9,9 @@
 DHT dht(DHT_PIN, DHT_TYPE);
 
 const char* ntpServer = "pool.ntp.org";
-const char* ssid = "Nackas hörna";
-const char* pw = "Lennartskoglund";
-const char* url = "";
+const char* ssid = "";
+const char* pw = "";
+const char* url = "https://devicewebapi.herokuapp.com/measurements";
 const char* deviceId = "Williams DHT11";
 
 unsigned long prevMillis = 0;
@@ -41,27 +41,15 @@ unsigned long getTime() {
   return now;
 }
 
-void httpPost(char message[256]) {
-  HTTPClient http;
-  http.begin(url);
-  http.addHeader("Content-Type", "application/json");
-  int response = http.POST(message);
-  Serial.print("HTTP response: ");
-  Serial.println(response);
-  http.end();
+/*void httpPost(char message[256]) {
   
-}
+  
+}*/
 
-char* createMessage(float temp, float hum, unsigned long unixTime) {
-  char message[256];
-  DynamicJsonDocument doc(1024);
-  doc["temperature"] = temp;
-  doc["humidity"] = hum;
-  doc["timeStamp"] = unixTime;
-  doc["deviceId"] = deviceId;
-  serializeJson(doc, message);
+/*char* createMessage(float temp, float hum, unsigned long unixTime) {
+  
   return message;
-}
+}*/
 
 void loop() {
   float temp = 15.0;//dht.readTemperature();
@@ -75,8 +63,20 @@ void loop() {
     Serial.print("Time: ");
     Serial.println(unixTime);
     if (WiFi.status() == WL_CONNECTED) {
-      char* message = createMessage(temp, hum, unixTime);
-      httpPost(message);
+      HTTPClient http;
+      http.begin(url);
+      http.addHeader("Content-Type", "application/json");
+      char message[256];
+      DynamicJsonDocument doc(1024);
+      doc["temperature"] = temp;
+      doc["humidity"] = hum;
+      doc["timeStamp"] = unixTime;
+      doc["deviceId"] = deviceId;
+      serializeJson(doc, message);
+      int response = http.POST(message);
+      Serial.print("HTTP response: ");
+      Serial.println(response);
+      http.end();
     }
     else{
       Serial.println("No WIFI");
