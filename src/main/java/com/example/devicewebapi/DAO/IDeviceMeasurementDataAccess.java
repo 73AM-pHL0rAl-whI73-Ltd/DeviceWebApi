@@ -11,4 +11,5 @@ public interface IDeviceMeasurementDataAccess {
 
     // get all measurements
     List<DeviceMessage> getAllDeviceMeasurements();
+    List<DeviceMessage> getLatestMeasurements(int top);
 }

@@ -20,4 +20,6 @@ public class DeviceService {
 
         public void addDeviceMeasurement(DeviceMessage message) {iDeviceMeasurementDataAccess.addDeviceMeasurement(message);}
         public List<DeviceMessage> getAllDeviceMeasurements() { return iDeviceMeasurementDataAccess.getAllDeviceMeasurements();}
+        public List<DeviceMessage> getLatestMeasurements(int top) { return iDeviceMeasurementDataAccess.getLatestMeasurements(top);}
+
 }
