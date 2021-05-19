@@ -38,7 +38,8 @@ class DeviceWebApiApplicationTests {
         mvc.perform(MockMvcRequestBuilders
                 .get("/measurements/latest/1")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",hasSize(1)));
     }
 
     @Test
@@ -50,6 +51,16 @@ class DeviceWebApiApplicationTests {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(2)));
+    }
+
+    @Test
+    public void test_GetByDeviceId()
+            throws Exception {
+
+        mvc.perform(MockMvcRequestBuilders
+                .get("/measurements/device/testdevice0")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
