@@ -35,21 +35,15 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDataAc
     @Override
     public List<DeviceMessage> getAllDeviceMeasurements() {
         String query = "SELECT * FROM Measurements";
-        return jdbcTemplate.query(query,(resultSet, index) -> new DeviceMessage(
-                resultSet.getDouble("temperature"),
-                resultSet.getDouble("humidity"),
-                resultSet.getLong("timeStamp"),
-                resultSet.getString("deviceId")
-        ));
+        return jdbcTemplate.query(query,
+                (resultSet, index) -> DeviceMessage.DeviceMessageFromResultSet(resultSet)
+        );
     }
     public List<DeviceMessage> getLatestMeasurements(int top){
         String query = "SELECT * FROM Measurements ORDER BY timeStamp LIMIT ?";
-        return jdbcTemplate.query(query,(resultSet, index) -> new DeviceMessage(
-                resultSet.getDouble("temperature"),
-                resultSet.getDouble("humidity"),
-                resultSet.getLong("timeStamp"),
-                resultSet.getString("deviceId")
-        ),
-        top);
+        return jdbcTemplate.query(query,
+                (resultSet, index) -> DeviceMessage.DeviceMessageFromResultSet(resultSet),
+                top
+        );
     }
 }
