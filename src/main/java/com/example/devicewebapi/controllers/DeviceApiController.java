@@ -1,6 +1,7 @@
 package com.example.devicewebapi.controllers;
 
 import com.example.devicewebapi.models.DeviceMessage;
+import com.example.devicewebapi.services.DashboardService;
 import com.example.devicewebapi.services.DeviceService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +13,22 @@ import java.util.List;
 @RequestMapping("measurements")
 @RestController
 public class DeviceApiController {
+
     private final DeviceService deviceService;
+    // services webservice/dashboard
+    private final DashboardService dashboardService;
 
     @Autowired
-    public DeviceApiController(DeviceService deviceService) {
+    public DeviceApiController(DeviceService deviceService, DashboardService dashboardService) {
         this.deviceService = deviceService;
+        this.dashboardService = dashboardService;
     }
     @PostMapping
-    public void addDeviceMeasurement(@RequestBody DeviceMessage message) {deviceService.addDeviceMeasurement(message);}
+    public void addDeviceMeasurement(@RequestBody DeviceMessage message) {
+        deviceService.addDeviceMeasurement(message);
+        // sends update message to webservice/dashboard
+        dashboardService.updateDashboard();
+    }
 
     @GetMapping
     public List<DeviceMessage> getAllMeasurements() {return deviceService.getAllDeviceMeasurements();}
