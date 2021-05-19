@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 @Service
-public class DeviceService {
+public class DeviceMeasurementService {
 
         private final IDeviceMeasurementDataAccess iDeviceMeasurementDataAccess;
 
         @Autowired
-        public DeviceService(@Qualifier("postgres") IDeviceMeasurementDataAccess iDeviceMeasurementDataAccess) {
+        public DeviceMeasurementService(@Qualifier("postgres") IDeviceMeasurementDataAccess iDeviceMeasurementDataAccess) {
             this.iDeviceMeasurementDataAccess = iDeviceMeasurementDataAccess;
         }
 
