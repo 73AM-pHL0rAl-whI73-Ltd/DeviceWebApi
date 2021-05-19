@@ -6,7 +6,6 @@ import com.example.devicewebapi.services.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -25,4 +24,6 @@ public class DeviceApiController {
     @GetMapping
     public List<DeviceMessage> getAllMeasurements() {return deviceService.getAllDeviceMeasurements();}
 
+    @GetMapping("/latest/{top}")
+    public List<DeviceMessage> getLatestMeasurements(@PathVariable int top) { return deviceService.getLatestMeasurements(top);}
     }

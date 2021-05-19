@@ -17,7 +17,6 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDataAc
     @Autowired
     private final JdbcTemplate jdbcTemplate;
 
-
     @Override
     public void addDeviceMeasurement(DeviceMessage measurement) {
         String query = "INSERT INTO Measurements " +
@@ -36,13 +35,21 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDataAc
     @Override
     public List<DeviceMessage> getAllDeviceMeasurements() {
         String query = "SELECT * FROM Measurements";
-
-        // execute query with lambda as rowmapper
-        return jdbcTemplate.query(query, (resultSet, index) -> new DeviceMessage(
+        return jdbcTemplate.query(query,(resultSet, index) -> new DeviceMessage(
                 resultSet.getDouble("temperature"),
                 resultSet.getDouble("humidity"),
                 resultSet.getLong("timeStamp"),
                 resultSet.getString("deviceId")
         ));
+    }
+    public List<DeviceMessage> getLatestMeasurements(int top){
+        String query = "SELECT * FROM Measurements ORDER BY timeStamp LIMIT ?";
+        return jdbcTemplate.query(query,(resultSet, index) -> new DeviceMessage(
+                resultSet.getDouble("temperature"),
+                resultSet.getDouble("humidity"),
+                resultSet.getLong("timeStamp"),
+                resultSet.getString("deviceId")
+        ),
+        top);
     }
 }
