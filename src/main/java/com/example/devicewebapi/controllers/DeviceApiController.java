@@ -24,6 +24,13 @@ public class DeviceApiController {
     @GetMapping
     public List<DeviceMessage> getAllMeasurements() {return deviceService.getAllDeviceMeasurements();}
 
+    @GetMapping("/latest/")
+    public List<DeviceMessage> getLatestOneMeasurements() { return deviceService.getLatestMeasurements(1);}
+
     @GetMapping("/latest/{top}")
     public List<DeviceMessage> getLatestMeasurements(@PathVariable int top) { return deviceService.getLatestMeasurements(top);}
+
+    @GetMapping("/device/{id}")
+    public List<DeviceMessage> getMeasurementByDeviceId(@PathVariable String id) { return deviceService.getMeasurementByDeviceId(id);}
+
     }
