@@ -5,6 +5,7 @@ import com.example.devicewebapi.models.DeviceMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -21,5 +22,5 @@ public class DeviceService {
         public void addDeviceMeasurement(DeviceMessage message) {iDeviceMeasurementDataAccess.addDeviceMeasurement(message);}
         public List<DeviceMessage> getAllDeviceMeasurements() { return iDeviceMeasurementDataAccess.getAllDeviceMeasurements();}
         public List<DeviceMessage> getLatestMeasurements(int top) { return iDeviceMeasurementDataAccess.getLatestMeasurements(top);}
-
+        public List<DeviceMessage> getMeasurementByDeviceId(String id) { return iDeviceMeasurementDataAccess.getMeasurementByDeviceId(id);}
 }
