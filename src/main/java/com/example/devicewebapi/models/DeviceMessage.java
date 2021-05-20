@@ -1,7 +1,6 @@
 package com.example.devicewebapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Cleanup;
 import lombok.Data;
 import lombok.NonNull;
 

@@ -35,6 +35,7 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDataAc
     @Override
     public List<DeviceMessage> getAllDeviceMeasurements() {
         String query = "SELECT * FROM Measurements";
+
         return jdbcTemplate.query(query,
                 (resultSet, index) -> DeviceMessage.DeviceMessageFromResultSet(resultSet)
         );
