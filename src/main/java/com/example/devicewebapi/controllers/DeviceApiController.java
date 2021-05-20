@@ -1,6 +1,7 @@
 package com.example.devicewebapi.controllers;
 
 import com.example.devicewebapi.models.DeviceMessage;
+import com.example.devicewebapi.models.DhtMessage;
 import com.example.devicewebapi.services.DashboardService;
 import com.example.devicewebapi.services.DeviceMeasurementService;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin(origins = "*")
 @RequestMapping("measurements")
@@ -24,22 +26,22 @@ public class DeviceApiController {
         this.dashboardService = dashboardService;
     }
     @PostMapping
-    public void addDeviceMeasurement(@RequestBody DeviceMessage message) {
+    public void addDeviceMeasurement(@RequestBody DhtMessage message) {
         deviceMeasurementService.addDeviceMeasurement(message);
         // sends update message to webservice/dashboard
         dashboardService.updateDashboard();
     }
 
     @GetMapping
-    public List<DeviceMessage> getAllMeasurements() {return deviceMeasurementService.getAllDeviceMeasurements();}
+    public List<DhtMessage> getAllMeasurements() {return deviceMeasurementService.getAllDeviceMeasurements();}
 
     @GetMapping("/latest/")
-    public List<DeviceMessage> getLatestOneMeasurements() { return deviceMeasurementService.getLatestMeasurements(1);}
+    public List<DhtMessage> getLatestOneMeasurements() { return deviceMeasurementService.getLatestMeasurements(1);}
 
     @GetMapping("/latest/{top}")
-    public List<DeviceMessage> getLatestMeasurements(@PathVariable int top) { return deviceMeasurementService.getLatestMeasurements(top);}
+    public List<DhtMessage> getLatestMeasurements(@PathVariable int top) { return deviceMeasurementService.getLatestMeasurements(top);}
 
     @GetMapping("/device/{id}")
-    public List<DeviceMessage> getMeasurementByDeviceId(@PathVariable String id) { return deviceMeasurementService.getMeasurementByDeviceId(id);}
+    public List<DhtMessage> getMeasurementByDeviceId(@PathVariable UUID id) { return deviceMeasurementService.getMeasurementByDeviceId(id);}
 
     }
