@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class DevicePojo {
+public class Device {
     private @JsonProperty("deviceId") UUID deviceId;
     private @JsonProperty("deviceAlias") String deviceAlias;
     private @JsonProperty("macAddress") String macAddress;
