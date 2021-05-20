@@ -2,6 +2,7 @@ package com.example.devicewebapi.DAO;
 
 
 import com.example.devicewebapi.models.DeviceMessage;
+import com.example.devicewebapi.models.DhtMessage;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,7 +19,7 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addDeviceMeasurement(DeviceMessage measurement) {
+    public void addDeviceMeasurement(DhtMessage measurement) {
         String query = "INSERT INTO Measurements " +
                 "(temperature, humidity, timeStamp, deviceId) " +
                 "VALUES (?, ? , ? , ? )";
@@ -27,34 +28,33 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
         jdbcTemplate.update(query,
                 measurement.getTemperature(),
                 measurement.getHumidity(),
-                measurement.getTimeStamp(),
-                measurement.getDeviceId()
+                measurement.getTimeStamp()
         );
     }
 
     @Override
-    public List<DeviceMessage> getAllDeviceMeasurements() {
+    public List<DhtMessage> getAllDeviceMeasurements() {
         String query = "SELECT * FROM Measurements";
 
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DeviceMessage.DeviceMessageFromResultSet(resultSet)
+                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet)
         );
     }
 
     @Override
-    public List<DeviceMessage> getLatestMeasurements(int top){
+    public List<DhtMessage> getLatestMeasurements(int top){
         String query = "SELECT * FROM Measurements ORDER BY timeStamp LIMIT ?";
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DeviceMessage.DeviceMessageFromResultSet(resultSet),
+                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
                 top
         );
     }
 
     @Override
-    public List<DeviceMessage> getMeasurementByDeviceId(String id) {
+    public List<DhtMessage> getMeasurementByDeviceId(String id) {
         String query = "SELECT * FROM Measurements WHERE deviceId = ?";
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DeviceMessage.DeviceMessageFromResultSet(resultSet),
+                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
                 id
         );
     }

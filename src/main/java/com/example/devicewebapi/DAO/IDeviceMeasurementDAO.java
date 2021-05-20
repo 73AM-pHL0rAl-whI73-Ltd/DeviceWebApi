@@ -1,16 +1,17 @@
 package com.example.devicewebapi.DAO;
 
 import com.example.devicewebapi.models.DeviceMessage;
+import com.example.devicewebapi.models.DhtMessage;
 
 import java.util.List;
 
 public interface IDeviceMeasurementDAO {
 
     // add measurements
-    void addDeviceMeasurement(DeviceMessage measurement);
+    void addDeviceMeasurement(DhtMessage measurement);
 
     // get all measurements
-    List<DeviceMessage> getAllDeviceMeasurements();
-    List<DeviceMessage> getLatestMeasurements(int top);
-    List<DeviceMessage> getMeasurementByDeviceId(String id);
+    List<DhtMessage> getAllDeviceMeasurements();
+    List<DhtMessage> getLatestMeasurements(int top);
+    List<DhtMessage> getMeasurementByDeviceId(String id);
 }
