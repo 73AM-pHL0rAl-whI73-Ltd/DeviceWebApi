@@ -4,7 +4,7 @@ import com.example.devicewebapi.models.DeviceMessage;
 
 import java.util.List;
 
-public interface IDeviceMeasurementDataAccess {
+public interface IDeviceMeasurementDAO {
 
     // add measurements
     void addDeviceMeasurement(DeviceMessage measurement);
