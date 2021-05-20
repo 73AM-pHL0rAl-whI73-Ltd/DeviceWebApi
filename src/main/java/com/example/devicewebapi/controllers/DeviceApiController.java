@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin(origins = "*")
 @RequestMapping("measurements")
@@ -41,6 +42,6 @@ public class DeviceApiController {
     public List<DhtMessage> getLatestMeasurements(@PathVariable int top) { return deviceMeasurementService.getLatestMeasurements(top);}
 
     @GetMapping("/device/{id}")
-    public List<DhtMessage> getMeasurementByDeviceId(@PathVariable String id) { return deviceMeasurementService.getMeasurementByDeviceId(id);}
+    public List<DhtMessage> getMeasurementByDeviceId(@PathVariable UUID id) { return deviceMeasurementService.getMeasurementByDeviceId(id);}
 
     }

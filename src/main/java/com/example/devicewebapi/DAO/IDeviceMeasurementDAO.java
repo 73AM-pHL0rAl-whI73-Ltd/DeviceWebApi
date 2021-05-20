@@ -4,6 +4,7 @@ import com.example.devicewebapi.models.DeviceMessage;
 import com.example.devicewebapi.models.DhtMessage;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IDeviceMeasurementDAO {
 
@@ -13,5 +14,5 @@ public interface IDeviceMeasurementDAO {
     // get all measurements
     List<DhtMessage> getAllDeviceMeasurements();
     List<DhtMessage> getLatestMeasurements(int top);
-    List<DhtMessage> getMeasurementByDeviceId(String id);
+    List<DhtMessage> getMeasurementByDeviceId(UUID id);
 }
