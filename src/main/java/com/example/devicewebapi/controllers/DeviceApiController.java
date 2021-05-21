@@ -1,10 +1,10 @@
 package com.example.devicewebapi.controllers;
 
-import com.example.devicewebapi.models.DeviceMessage;
 import com.example.devicewebapi.models.DhtMessage;
 import com.example.devicewebapi.services.DashboardService;
 import com.example.devicewebapi.services.DeviceMeasurementService;
 
+import com.example.devicewebapi.services.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.*;
@@ -19,17 +19,22 @@ public class DeviceApiController {
     private final DeviceMeasurementService deviceMeasurementService;
     // services webservice/dashboard
     private final DashboardService dashboardService;
+    private final DeviceService deviceService;
 
     @Autowired
-    public DeviceApiController(DeviceMeasurementService deviceMeasurementService, DashboardService dashboardService) {
+    public DeviceApiController(DeviceMeasurementService deviceMeasurementService, DashboardService dashboardService, DeviceService deviceService) {
         this.deviceMeasurementService = deviceMeasurementService;
         this.dashboardService = dashboardService;
+        this.deviceService = deviceService;
     }
     @PostMapping
     public void addDeviceMeasurement(@RequestBody DhtMessage message) {
+
         deviceMeasurementService.addDeviceMeasurement(message);
-        // sends update message to webservice/dashboard
-        dashboardService.updateDashboard();
+
+        // get device from id and send it to webservice
+        var device = deviceService.getDeviceById(message.getDeviceId());
+        dashboardService.updateDashboard(device);
     }
 
     @GetMapping
