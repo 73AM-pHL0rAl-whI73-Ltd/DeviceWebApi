@@ -16,8 +16,11 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     @GetMapping("/new") // generate new device for webservice client
-    public Device generateDevice(@RequestParam("deviceAlias")) {
+    public Device generateDevice(@RequestParam("deviceAlias") String deviceAlias) {
         // needs to create new device with provided deviceAlias
+        var device = new Device();
+        device.setDeviceAlias(deviceAlias);
+        deviceService.addDevice(new Device());
     }
 
 }
