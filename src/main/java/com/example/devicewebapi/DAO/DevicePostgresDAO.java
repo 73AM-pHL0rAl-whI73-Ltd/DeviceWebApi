@@ -83,9 +83,11 @@ public class DevicePostgresDAO implements IDeviceDAO {
     @Override
     public Device getDeviceById(UUID id) {
         String query = "SELECT * FROM " +
-                "\"Devices\" " +
-                "NATURAL JOIN \"DeviceInfo\" " +
-                "NATURAL JOIN \"SensorTypes\" " +
+                "\"Devices\" devices " +
+                "INNER JOIN  " +
+                "\"DeviceInfo\" deviceinfo on devices.\"deviceInfoId\" = deviceinfo.id " +
+                "INNER JOIN " +
+                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id " +
                 "WHERE \"deviceId\" = ?";
 
         return jdbcTemplate.query(
@@ -106,9 +108,11 @@ public class DevicePostgresDAO implements IDeviceDAO {
     @Override
     public Device getDeviceByAlias(String alias) {
         String query = "SELECT * FROM " +
-                "\"Devices\" " +
-                "NATURAL JOIN \"DeviceInfo\" " +
-                "NATURAL JOIN \"SensorTypes\" " +
+                "\"Devices\" devices " +
+                "INNER JOIN  " +
+                "\"DeviceInfo\" deviceinfo on devices.\"deviceInfoId\" = deviceinfo.id " +
+                "INNER JOIN " +
+                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id " +
                 "WHERE \"deviceAlias\" = ?";
 
         return jdbcTemplate.query(
@@ -129,9 +133,11 @@ public class DevicePostgresDAO implements IDeviceDAO {
     @Override
     public List<Device> getAllDevices() {
         String query = "SELECT * FROM " +
-                "\"Devices\" " +
-                "NATURAL JOIN \"DeviceInfo\" " +
-                "NATURAL JOIN \"SensorTypes\" ";
+                "\"Devices\" devices " +
+                "INNER JOIN  " +
+                "\"DeviceInfo\" deviceinfo on devices.\"deviceInfoId\" = deviceinfo.id " +
+                "INNER JOIN " +
+                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id";
 
         return jdbcTemplate.query(
                 query,
