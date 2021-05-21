@@ -14,6 +14,12 @@ public interface IDeviceDAO {
     }
     void addDevice(Device device);
 
+    default Device generateNewDeviceFromAlias(Device device) {
+        device.setDeviceId(UUID.randomUUID());
+        addDevice(device);
+        return device;
+    }
+
     Device getDeviceById(UUID id);
     Device getDeviceByAlias(String alias);
     List<Device> getAllDevices();
