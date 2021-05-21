@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository("devicepostgres")
@@ -22,51 +23,168 @@ public class DevicePostgresDAO implements IDeviceDAO {
     //TODO: Check if this works?
     @Override
     public void addDevice(Device device) {
-        KeyHolder holder = new GeneratedKeyHolder();
+        String query;
 
-        String query = "INSERT INTO \"DeviceInfo\" " +
-                "(\"deviceId\", \"deviceAlias\", \"macAddress\") " +
-                "VALUES (?, ? , ?) RETURNING id";
+        int deviceInfoId;
+        int sensorId;
 
-        int deviceId = jdbcTemplate.query(query,
-                (resultSet) -> {
-                    resultSet.next();
-                    return resultSet.getInt("Id");
-                },
-                new Object[]{
-                        device.getDeviceId(),
-                        device.getDeviceAlias(),
-                        device.getMacAddress()});
+        // check for already existing rows
+        var deviceInfoIdMaybe = getDeviceInfoId(device);
+        var sensorTypeIdMaybe = getSensorTypeId(device);
 
-        query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
+        // insert deviceinfo if it does not exist
+        if(deviceInfoIdMaybe.isEmpty())
+        {
+            query =
+                    "INSERT INTO \"DeviceInfo\" " +
+                            "(\"deviceId\", \"deviceAlias\", \"macAddress\") " +
+                            "VALUES (?, ? , ?) " +
+                            "ON CONFLICT DO NOTHING " +
+                            "RETURNING id";
 
-        int sensorId = jdbcTemplate.query(query,
-                (resultSet) -> {
-                    resultSet.next();
-                    return resultSet.getInt("Id");
-                },
-                new Object[]{
-                        device.getSensorType()});
+            deviceInfoId = jdbcTemplate.query(query,
+                    (resultSet) -> {
+                        resultSet.next();
+                        return resultSet.getInt("Id");
+                    },
+                    new Object[]{
+                            device.getDeviceId(),
+                            device.getDeviceAlias(),
+                            device.getMacAddress()});
+        } else deviceInfoId = deviceInfoIdMaybe.get();
 
-        query = "INSERT INTO \"Devices\" (\"sensorType\", \"deviceInfoId\") VALUES (?,?)";
+        // insert sensor type if it does not exist
+        if(sensorTypeIdMaybe.isEmpty()) {
+            query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
 
-        jdbcTemplate.update(query,
-                sensorId,
-                deviceId);
+            sensorId = jdbcTemplate.query(query,
+                    (resultSet) -> {
+                        resultSet.next();
+                        return resultSet.getInt("Id");
+                    },
+                    new Object[]{
+                            device.getSensorType()});
+        } else sensorId = sensorTypeIdMaybe.get();
+
+        // if there is a device present
+        var deviceIdMaybe =  getDeviceId(deviceInfoId, sensorId);
+
+        if(deviceIdMaybe.isEmpty()) // no device present, insert device
+        {
+            query = "INSERT INTO \"Devices\" (\"sensorType\", \"deviceInfoId\") VALUES (?,?)";
+
+            jdbcTemplate.update(query,
+                    sensorId,
+                    deviceInfoId);
+        }
+
     }
     // TODO: Implement this:
     @Override
     public Device getDeviceById(UUID id) {
-        return null;
+        String query = "SELECT * FROM " +
+                "\"Devices\" " +
+                "NATURAL JOIN \"DeviceInfo\" " +
+                "NATURAL JOIN \"SensorTypes\" " +
+                "WHERE \"deviceId\" = ?";
+
+        return jdbcTemplate.query(
+                query,
+                resultSet -> {
+                    if(!resultSet.next()) return null;
+                    return new Device(
+                            resultSet.getObject("deviceId", UUID.class),
+                            resultSet.getString("deviceAlias"),
+                            resultSet.getString("macAddress"),
+                            resultSet.getString("sensorType")
+                    );
+                },
+                id
+        );
     }
 
     @Override
     public Device getDeviceByAlias(String alias) {
-        return null;
+        String query = "SELECT * FROM " +
+                "\"Devices\" " +
+                "NATURAL JOIN \"DeviceInfo\" " +
+                "NATURAL JOIN \"SensorTypes\" " +
+                "WHERE \"deviceAlias\" = ?";
+
+        return jdbcTemplate.query(
+                query,
+                resultSet -> {
+                    if(!resultSet.next()) return null;
+                    return new Device(
+                            resultSet.getObject("deviceId", UUID.class),
+                            resultSet.getString("deviceAlias"),
+                            resultSet.getString("macAddress"),
+                            resultSet.getString("sensorType")
+                    );
+                },
+                alias
+        );
     }
 
     @Override
     public List<Device> getAllDevices() {
-        return null;
+        String query = "SELECT * FROM " +
+                "\"Devices\" " +
+                "NATURAL JOIN \"DeviceInfo\" " +
+                "NATURAL JOIN \"SensorTypes\" ";
+
+        return jdbcTemplate.query(
+                query,
+                (resultSet,index) -> new Device(
+                        resultSet.getObject("deviceId", UUID.class),
+                        resultSet.getString("deviceAlias"),
+                        resultSet.getString("macAddress"),
+                        resultSet.getString("sensorType")
+                )
+        );
+    }
+
+    private Optional<Integer> getDeviceInfoId(Device device) {
+        String query = "SELECT id FROM \"DeviceInfo\" WHERE " +
+                "\"deviceId\" = ? OR " +
+                "\"deviceAlias\" = ? OR " +
+                "\"macAddress\" = ?";
+
+        return Optional.ofNullable(jdbcTemplate.query(query,
+                (resultSet) -> {
+                    if(!resultSet.next()) return null;
+                    return resultSet.getInt("Id");
+                },
+                device.getDeviceId(),
+                device.getDeviceAlias(),
+                device.getMacAddress())
+        );
+    }
+    private Optional<Integer> getSensorTypeId(Device device) {
+        String query = "SELECT id FROM \"SensorTypes\" WHERE \"sensorType\" = ?";
+
+        return Optional.ofNullable(jdbcTemplate.query(
+                query,
+                (resultSet) -> {
+                    if(!resultSet.next()) return null;
+                    return resultSet.getInt("Id");
+                },
+                device.getSensorType())
+        );
+    }
+
+    private Optional<Integer> getDeviceId(int deviceInfoId, int sensorTypeId) {
+        String query = "SELECT id FROM \"Devices\" WHERE " +
+                "\"sensorType\" = ? AND \"deviceInfoId\" = ?";
+
+        return Optional.ofNullable(jdbcTemplate.query(
+                query,
+                (resultSet) -> {
+                    if(!resultSet.next()) return null;
+                    return resultSet.getInt("Id");
+                },
+                sensorTypeId,
+                deviceInfoId
+        ));
     }
 }
