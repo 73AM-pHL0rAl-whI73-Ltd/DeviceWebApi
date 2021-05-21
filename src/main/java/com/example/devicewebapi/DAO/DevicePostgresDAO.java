@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Repository("devicepostgres")
 @AllArgsConstructor
-public class DevicePostgresDAO implements IDeviceDAO{
+public class DevicePostgresDAO implements IDeviceDAO {
 
     @Autowired
     private final JdbcTemplate jdbcTemplate;
@@ -28,32 +28,33 @@ public class DevicePostgresDAO implements IDeviceDAO{
                 "(\"deviceId\", \"deviceAlias\", \"macAddress\") " +
                 "VALUES (?, ? , ?) RETURNING id";
 
-       int deviceId = jdbcTemplate.query(query,
+        int deviceId = jdbcTemplate.query(query,
                 (resultSet) -> {
-            resultSet.next();
-            return resultSet.getInt("Id"); },
+                    resultSet.next();
+                    return resultSet.getInt("Id");
+                },
                 new Object[]{
-                device.getDeviceId(),
-                device.getDeviceAlias(),
-                device.getMacAddress() });
+                        device.getDeviceId(),
+                        device.getDeviceAlias(),
+                        device.getMacAddress()});
 
-  query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
+        query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
 
         int sensorId = jdbcTemplate.query(query,
                 (resultSet) -> {
                     resultSet.next();
-                    return resultSet.getInt("Id"); },
+                    return resultSet.getInt("Id");
+                },
                 new Object[]{
-                        device.getSensorType() });
+                        device.getSensorType()});
 
         query = "INSERT INTO \"Devices\" (\"sensorType\", \"deviceInfoId\") VALUES (?,?)";
 
         jdbcTemplate.update(query,
                 sensorId,
                 deviceId);
-
     }
-// TODO: Implement this:
+    // TODO: Implement this:
     @Override
     public Device getDeviceById(UUID id) {
         return null;
