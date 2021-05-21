@@ -20,7 +20,12 @@ public class DeviceService {
 
     public void addDevice(Device device) {iDeviceDAO.addDevice(device);}
     public void addDevice(UUID id, Device device) {iDeviceDAO.addDevice(id, device);}
+    public Device generateNewDeviceFromAlias(Device device) {return iDeviceDAO.generateNewDeviceFromAlias(device);}
+
     public Device getDeviceById(UUID id) { return iDeviceDAO.getDeviceById(id);}
     public Device getDeviceByAlias(String alias) { return iDeviceDAO.getDeviceByAlias(alias);}
+
     public List<Device> getAllDevices() { return iDeviceDAO.getAllDevices();}
+
+
 }

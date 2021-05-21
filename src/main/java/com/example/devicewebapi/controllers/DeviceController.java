@@ -18,16 +18,13 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     @PostMapping("/new") // generate new device for webservice client
-    public UUID generateDevice(@RequestParam("deviceAlias") String deviceAlias) {
+    public Device generateDevice(@RequestParam("deviceAlias") String deviceAlias) {
         //create empty device and set Alias
         var device = new Device();
         device.setDeviceAlias(deviceAlias);
 
         // add device, DAO generates new UUID for device
-        deviceService.addDevice(device);
-
-        //needs to return UUID to webservice client
-        return null;
+        return deviceService.generateNewDeviceFromAlias(device);
     }
 
 }
