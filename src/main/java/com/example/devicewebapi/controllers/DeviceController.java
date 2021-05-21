@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @CrossOrigin(origins = "*")
 @RequestMapping("devices")
 @RestController
@@ -15,12 +17,17 @@ public class DeviceController {
     @Autowired
     private final DeviceService deviceService;
 
-    @GetMapping("/new") // generate new device for webservice client
-    public Device generateDevice(@RequestParam("deviceAlias") String deviceAlias) {
-        // needs to create new device with provided deviceAlias
+    @PostMapping("/new") // generate new device for webservice client
+    public UUID generateDevice(@RequestParam("deviceAlias") String deviceAlias) {
+        //create empty device and set Alias
         var device = new Device();
         device.setDeviceAlias(deviceAlias);
-        deviceService.addDevice(new Device());
+
+        // add device, DAO generates new UUID for device
+        deviceService.addDevice(device);
+
+        //needs to return UUID to webservice client
+        return null;
     }
 
 }
