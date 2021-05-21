@@ -24,27 +24,29 @@ public class DevicePostgresDAO implements IDeviceDAO{
     public void addDevice(Device device) {
         KeyHolder holder = new GeneratedKeyHolder();
 
-        String query = "INSERT INTO DeviceInfo " +
-                "(deviceId, deviceAlias, macAddress) " +
+        String query = "INSERT INTO \"DeviceInfo\" " +
+                "(\"deviceId\", \"deviceAlias\", \"macAddress\") " +
                 "VALUES (?, ? , ?) RETURNING id";
-        jdbcTemplate.update(query,
+
+       int deviceId = jdbcTemplate.query(query,
+                (resultSet) -> {
+            resultSet.next();
+            return resultSet.getInt("Id"); },
+                new Object[]{
                 device.getDeviceId(),
                 device.getDeviceAlias(),
-                device.getMacAddress(), holder, new String[] { "id" });
-        int deviceId = holder.getKey().intValue();
+                device.getMacAddress() });
 
-        query = "INSERT INTO SensorTypes " +
-                "(SensorType) " +
-                "VALUES (?) RETURNING id";
+  query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
 
-       jdbcTemplate.update(query,
-                device.getSensorType(), holder, new String[] { "id" });
+        int sensorId = jdbcTemplate.query(query,
+                (resultSet) -> {
+                    resultSet.next();
+                    return resultSet.getInt("Id"); },
+                new Object[]{
+                        device.getSensorType() });
 
-        int sensorId = holder.getKey().intValue();
-
-        query = "INSERT INTO Devices " +
-                "(sensorType, deviceInfoId) " +
-                "VALUES (?,?)";
+        query = "INSERT INTO \"Devices\" (\"sensorType\", \"deviceInfoId\") VALUES (?,?)";
 
         jdbcTemplate.update(query,
                 sensorId,
