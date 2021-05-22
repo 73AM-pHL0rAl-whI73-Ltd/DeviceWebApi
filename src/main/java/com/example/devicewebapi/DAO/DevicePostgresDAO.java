@@ -193,4 +193,20 @@ public class DevicePostgresDAO implements IDeviceDAO {
                 deviceInfoId
         ));
     }
+
+    public Optional<Integer> getDhtDeviceIdByUUID(UUID messageDeviceId) {
+        // TODO: Refactor DevicePostgresDAO method parameters instead?
+        // to hold values
+        var device = new Device();
+        device.setDeviceId(messageDeviceId);
+        device.setSensorType("dht");
+
+        var deviceInfoIdMaybe = getDeviceInfoId(device);
+        var deviceSensorTypeIdMaybe = getSensorTypeId(device);
+
+        if(deviceInfoIdMaybe.isPresent() & deviceSensorTypeIdMaybe.isPresent())
+            return getDeviceId(deviceSensorTypeIdMaybe.get(), deviceInfoIdMaybe.get());
+        else
+            return Optional.empty();
+    }
 }

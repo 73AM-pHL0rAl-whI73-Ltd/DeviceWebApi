@@ -18,6 +18,7 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
     // java database connector
     @Autowired
     private final JdbcTemplate jdbcTemplate;
+    private DevicePostgresDAO devicePostgresDAO;
 
     @Override
     public void addDeviceMeasurement(DhtMessage measurement) {
