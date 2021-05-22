@@ -209,4 +209,19 @@ public class DevicePostgresDAO implements IDeviceDAO {
         else
             return Optional.empty();
     }
+    public Optional<Integer> getDhtDeviceIdByAlias(String alias) {
+        // TODO: Refactor DevicePostgresDAO method parameters instead?
+        // to hold values
+        var device = new Device();
+        device.setDeviceAlias(alias);
+        device.setSensorType("dht");
+
+        var deviceInfoIdMaybe = getDeviceInfoId(device);
+        var deviceSensorTypeIdMaybe = getSensorTypeId(device);
+
+        if(deviceInfoIdMaybe.isPresent() & deviceSensorTypeIdMaybe.isPresent())
+            return getDeviceId(deviceSensorTypeIdMaybe.get(), deviceInfoIdMaybe.get());
+        else
+            return Optional.empty();
+    }
 }
