@@ -23,4 +23,10 @@ public class DeviceMeasurementService {
         public List<DhtMessage> getAllDeviceMeasurements() { return iDeviceMeasurementDataAccess.getAllDeviceMeasurements();}
         public List<DhtMessage> getLatestMeasurements(int top) { return iDeviceMeasurementDataAccess.getLatestMeasurements(top);}
         public List<DhtMessage> getMeasurementByDeviceId(UUID id) { return iDeviceMeasurementDataAccess.getMeasurementByDeviceId(id);}
+        public List<DhtMessage> getLatestMeasurementById(UUID id, int amount) {
+                return iDeviceMeasurementDataAccess.getLatestMeasurementById(id, amount);
+        }
+        public List<DhtMessage> getLatestMeasurementByAlias(String alias, int amount) {
+                return iDeviceMeasurementDataAccess.getLatestMeasurementByAlias(alias, amount);
+        }
 }
