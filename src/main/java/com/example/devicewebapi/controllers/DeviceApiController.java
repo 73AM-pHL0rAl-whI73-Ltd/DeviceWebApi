@@ -29,11 +29,11 @@ public class DeviceApiController {
     }
     @PostMapping
     public void addDeviceMeasurement(@RequestBody DhtMessage message) {
+        // TODO : change return type of getDeviceById to Optional
+        var device = deviceService.getDeviceById(message.getDeviceId());
+        if(device == null) return; // do not add measurement if no device found
 
         deviceMeasurementService.addDeviceMeasurement(message);
-
-        // get device from id and send it to webservice
-        var device = deviceService.getDeviceById(message.getDeviceId());
         dashboardService.updateDashboard(device);
     }
 
