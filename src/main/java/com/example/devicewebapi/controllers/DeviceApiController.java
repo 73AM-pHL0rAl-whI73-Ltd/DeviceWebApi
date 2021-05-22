@@ -51,7 +51,7 @@ public class DeviceApiController {
         return null;
     }
     @GetMapping("/latest/{id}/{top}")
-    public List<DhtMessage> getLatestMeasurementsByAlias(@PathVariable UUID id, @PathVariable int top) {
+    public List<DhtMessage> getLatestMeasurementsById(@PathVariable UUID id, @PathVariable int top) {
         return null;
     }
 
