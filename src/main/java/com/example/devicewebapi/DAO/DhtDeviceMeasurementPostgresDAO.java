@@ -18,10 +18,15 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
     // java database connector
     @Autowired
     private final JdbcTemplate jdbcTemplate;
+    private DevicePostgresDAO devicePostgresDAO;
 
     @Override
     public void addDeviceMeasurement(DhtMessage measurement) {
         //TODO: Fix query to JOIN deviceId from DeviceInfo table.
+        var deviceIdMaybe = devicePostgresDAO.getDhtDeviceIdByUUID(measurement.getDeviceId());
+
+        if(deviceIdMaybe.isEmpty()) return;
+
         String query = "INSERT INTO DhtMessages " +
                 "(temperature, humidity, timeStamp, ) " +
                 "VALUES (?, ? , ?, ? )";
@@ -31,7 +36,7 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
                 measurement.getTemperature(),
                 measurement.getHumidity(),
                 measurement.getTimeStamp(),
-                measurement.getDeviceId()
+                deviceIdMaybe.get()
         );
     }
 
@@ -55,10 +60,15 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
 
     @Override
     public List<DhtMessage> getMeasurementByDeviceId(UUID id) {
+        var deviceIdMaybe = devicePostgresDAO.getDhtDeviceIdByUUID(id);
+
+        if(deviceIdMaybe.isEmpty()) return null;
+
         String query = "SELECT * FROM DhtMessages WHERE deviceId = ?";
+
         return jdbcTemplate.query(query,
                 (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
-                id
+                deviceIdMaybe.get()
         );
     }
 }
