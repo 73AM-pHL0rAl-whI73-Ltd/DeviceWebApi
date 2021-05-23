@@ -6,20 +6,20 @@ import lombok.NonNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @Data
-public class DeviceMessage { // represents message from device
+public class DhtMessage {
     private @NonNull @JsonProperty("temperature") Double temperature;
     private @NonNull @JsonProperty("humidity") Double humidity;
     private @NonNull @JsonProperty("timeStamp") Long timeStamp;
-    private @NonNull @JsonProperty("deviceId") String deviceId;
+    private @NonNull @JsonProperty("deviceId") UUID deviceId;
 
-    // returns new DeviceMessage object from resultset
-    public static DeviceMessage DeviceMessageFromResultSet(ResultSet resultSet) throws SQLException {
-        return new DeviceMessage(resultSet.getDouble("temperature"),
+    public static DhtMessage DhtMessageFromResultSet(ResultSet resultSet) throws SQLException {
+        return new DhtMessage(resultSet.getDouble("temperature"),
                 resultSet.getDouble("humidity"),
                 resultSet.getLong("timeStamp"),
-                resultSet.getString("deviceId")
+                resultSet.getObject("deviceId", UUID.class)
         );
     }
 }
