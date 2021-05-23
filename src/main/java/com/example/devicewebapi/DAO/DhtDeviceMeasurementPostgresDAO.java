@@ -26,10 +26,9 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
         //TODO: Fix query to JOIN deviceId from DeviceInfo table.
         var deviceIdMaybe = devicePostgresDAO.getDhtDeviceIdByUUID(measurement.getDeviceId());
 
-        if(deviceIdMaybe.isEmpty()) {
-            System.out.println("no deviceId found");
+        if(deviceIdMaybe.isEmpty())
             return;
-        }
+
 
         String query = "INSERT INTO \"DhtMessages\" " +
                 "(temperature, humidity, \"timeStamp\", \"deviceId\" ) " +
@@ -64,7 +63,14 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
     public List<DhtMessage> getLatestMeasurements(int top){
         String query = "SELECT * FROM \"DhtMessages\" ORDER BY \"timeStamp\" LIMIT ?";
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
+                (resultSet, index) ->{
+                    return new DhtMessage(
+                            resultSet.getDouble("temperature"),
+                            resultSet.getDouble("humidity"),
+                            resultSet.getLong("timeStamp"),
+                            devicePostgresDAO.getDeviceUUIDFromDeviceId(resultSet.getInt("deviceId"))
+                    );
+                },
                 top
         );
     }
@@ -78,7 +84,14 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
         String query = "SELECT * FROM \"DhtMessages\" WHERE \"deviceId\" = ?";
 
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
+                (resultSet, index) -> {
+                    return new DhtMessage(
+                            resultSet.getDouble("temperature"),
+                            resultSet.getDouble("humidity"),
+                            resultSet.getLong("timeStamp"),
+                            devicePostgresDAO.getDeviceUUIDFromDeviceId(resultSet.getInt("deviceId"))
+                    );
+                },
                 deviceIdMaybe.get()
         );
     }
@@ -86,21 +99,25 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
     @Override
     public List<DhtMessage> getLatestDeviceMeasurements(Device device, int amount) {
 
+        int id;
 
-        var id = devicePostgresDAO
-                .getDhtDeviceIdByAlias(device.getDeviceAlias()).
-                        orElse(
-                                devicePostgresDAO.
-                                        getDhtDeviceIdByUUID(device.getDeviceId()).
-                                        get()
-                        );
-        if(id == null) return null;
+        if(device.getDeviceAlias() != null)
+            id = devicePostgresDAO.getDhtDeviceIdByAlias(device.getDeviceAlias()).orElse(-1);
+        else
+            id = devicePostgresDAO.getDhtDeviceIdByUUID(device.getDeviceId()).orElse(-1);
 
         String query = "SELECT * FROM \"DhtMessages\" WHERE \"deviceId\" = ? " +
-                        "ORDER BY timeStamp LIMIT ?";
+                        "ORDER BY \"timeStamp\" LIMIT ?";
 
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
+                (resultSet, index) -> {
+                    return new DhtMessage(
+                            resultSet.getDouble("temperature"),
+                            resultSet.getDouble("humidity"),
+                            resultSet.getLong("timeStamp"),
+                            devicePostgresDAO.getDeviceUUIDFromDeviceId(resultSet.getInt("deviceId"))
+                    );
+                },
                 id,
                 amount
         );
