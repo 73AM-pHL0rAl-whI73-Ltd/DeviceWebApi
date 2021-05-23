@@ -22,7 +22,7 @@ public class DevicePostgresDAO implements IDeviceDAO {
 
     //TODO: Check if this works?
     @Override
-    public void addDevice(Device device) {
+    public Boolean addDevice(Device device) {
         String query;
 
         int deviceInfoId;
@@ -76,8 +76,10 @@ public class DevicePostgresDAO implements IDeviceDAO {
             jdbcTemplate.update(query,
                     sensorId,
                     deviceInfoId);
-        }
 
+            return true; // new device added
+        }
+        return false; // device already exists
     }
     // TODO: Implement this:
     @Override

@@ -8,16 +8,17 @@ import java.util.UUID;
 public interface IDeviceDAO {
 
     // generates new UUID for new device
-    default void addDevice(UUID id, Device device) {
+    default Boolean addDevice(UUID id, Device device) {
         device.setDeviceId(UUID.randomUUID());
-        addDevice(device);
+        return addDevice(device);
     }
-    void addDevice(Device device);
+    Boolean addDevice(Device device);
 
     default Device generateNewDeviceFromAlias(Device device) {
         device.setDeviceId(UUID.randomUUID());
         addDevice(device);
-        return device;
+        //return device;
+        return addDevice(device) ? device : null;
     }
 
     Device getDeviceById(UUID id);

@@ -18,7 +18,7 @@ public class DeviceService {
         this.iDeviceDAO = iDeviceDAO;
     }
 
-    public void addDevice(Device device) {iDeviceDAO.addDevice(device);}
+    public Boolean addDevice(Device device) { return iDeviceDAO.addDevice(device);}
     public void addDevice(UUID id, Device device) {iDeviceDAO.addDevice(id, device);}
     public Device generateNewDeviceFromAlias(Device device) {return iDeviceDAO.generateNewDeviceFromAlias(device);}
 
