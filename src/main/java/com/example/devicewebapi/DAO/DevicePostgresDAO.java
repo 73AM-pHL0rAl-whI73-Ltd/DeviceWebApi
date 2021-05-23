@@ -110,11 +110,11 @@ public class DevicePostgresDAO implements IDeviceDAO {
     @Override
     public Device getDeviceByAlias(String alias) {
         String query = "SELECT * FROM " +
-                "\"Devices\" devices " +
+                "(\"Devices\" devices " +
                 "INNER JOIN  " +
                 "\"DeviceInfo\" deviceinfo on devices.\"deviceInfoId\" = deviceinfo.id " +
                 "INNER JOIN " +
-                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id " +
+                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id) " +
                 "WHERE \"deviceAlias\" = ?";
 
         return jdbcTemplate.query(

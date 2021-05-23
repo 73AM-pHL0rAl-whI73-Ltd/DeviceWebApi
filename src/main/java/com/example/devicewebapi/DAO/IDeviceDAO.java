@@ -15,9 +15,14 @@ public interface IDeviceDAO {
     Boolean addDevice(Device device);
 
     default Device generateNewDeviceFromAlias(Device device) {
+        // abort if device with alias already exists
+        if(getDeviceByAlias(device.getDeviceAlias()) != null)
+            return null;
+
+        // generate new UUID for device
         device.setDeviceId(UUID.randomUUID());
-        addDevice(device);
-        //return device;
+
+        // return null if device already exists
         return addDevice(device) ? device : null;
     }
 
