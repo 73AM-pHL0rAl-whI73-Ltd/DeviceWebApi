@@ -46,12 +46,10 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
 
     @Override
     public List<DhtMessage> getAllDeviceMeasurements() {
-        System.out.println("getting all device measurements");
-        String query = "SELECT * FROM \"DhtMessages\"";
-        System.out.println("just before executing query");
+        String query = "SELECT * FROM \"DhtMessages\"";;
+
         return jdbcTemplate.query(query,
                 (resultSet, index) ->  {
-                    System.out.println("inside lambda");
                     return new DhtMessage(
                             resultSet.getDouble("temperature"),
                             resultSet.getDouble("humidity"),
