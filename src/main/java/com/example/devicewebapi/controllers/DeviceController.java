@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +20,11 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     @PostMapping("/new/{devicealias}") // generate new device for webservice client
-    public Device generateDevice(@PathVariable String devicealias) {
+    public Device generateDevice(@PathVariable String devicealias, HttpServletResponse response) {
+
+        // let javascript access response
+        response.setHeader("Access-Control-Allow-Origin", "*");
+
         //create empty device and set Alias
         var device = new Device();
         device.setDeviceAlias(devicealias);
