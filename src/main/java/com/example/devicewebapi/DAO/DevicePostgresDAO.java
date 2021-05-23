@@ -183,15 +183,17 @@ public class DevicePostgresDAO implements IDeviceDAO {
 
     private Optional<Integer> getDeviceId(int deviceInfoId, int sensorTypeId) {
         String query = "SELECT id FROM \"Devices\" WHERE " +
-                "\"sensorType\" = ? AND \"deviceInfoId\" = ?";
-
+                " \"deviceInfoId\" = ?";
+        // TODO : removed "sensorType" = ? AND from query because we haven't added sensor type
+        // yet
+        System.out.println("deviceinfoid : " + deviceInfoId);
         return Optional.ofNullable(jdbcTemplate.query(
                 query,
                 (resultSet) -> {
                     if(!resultSet.next()) return null;
                     return resultSet.getInt("Id");
                 },
-                sensorTypeId,
+                //sensorTypeId,
                 deviceInfoId
         ));
     }
@@ -201,15 +203,22 @@ public class DevicePostgresDAO implements IDeviceDAO {
         // to hold values
         var device = new Device();
         device.setDeviceId(messageDeviceId);
-        device.setSensorType("dht");
+        //device.setSensorType("dht");
 
         var deviceInfoIdMaybe = getDeviceInfoId(device);
         var deviceSensorTypeIdMaybe = getSensorTypeId(device);
 
-        if(deviceInfoIdMaybe.isPresent() & deviceSensorTypeIdMaybe.isPresent())
-            return getDeviceId(deviceSensorTypeIdMaybe.get(), deviceInfoIdMaybe.get());
+        if(deviceInfoIdMaybe.isPresent() ) // commented out "& deviceSensorTypeIdMaybe.isPresent()"
+        {
+            System.out.println("ids are present");
+            return getDeviceId(deviceInfoIdMaybe.get(), deviceSensorTypeIdMaybe.orElse(0));
+        }
         else
+        {
+            System.out.println("ids are not present");
             return Optional.empty();
+        }
+
     }
     public Optional<Integer> getDhtDeviceIdByAlias(String alias) {
         // TODO: Refactor DevicePostgresDAO method parameters instead?
@@ -225,5 +234,23 @@ public class DevicePostgresDAO implements IDeviceDAO {
             return getDeviceId(deviceSensorTypeIdMaybe.get(), deviceInfoIdMaybe.get());
         else
             return Optional.empty();
+    }
+    public UUID getDeviceUUIDFromDeviceId(int deviceId) {
+        String query = "SELECT * FROM " +
+                "(\"Devices\" devices " +
+                "INNER JOIN  " +
+                "\"DeviceInfo\" deviceinfo on devices.\"deviceInfoId\" = deviceinfo.id) " +
+                "WHERE devices.id = ?";
+
+        System.out.println("getting UUID from deviceId");
+
+        return jdbcTemplate.query(
+                query,
+                (resultSet) -> {
+                    if(!resultSet.next()) return null;
+                    return resultSet.getObject("deviceId", UUID.class);
+                },
+                deviceId
+        );
     }
 }
