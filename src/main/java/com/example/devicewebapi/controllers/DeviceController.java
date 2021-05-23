@@ -18,11 +18,11 @@ public class DeviceController {
     @Autowired
     private final DeviceService deviceService;
 
-    @PostMapping("/new") // generate new device for webservice client
-    public Device generateDevice(@RequestParam("deviceAlias") String deviceAlias) {
+    @PostMapping("/new/{devicealias}") // generate new device for webservice client
+    public Device generateDevice(@PathVariable String devicealias) {
         //create empty device and set Alias
         var device = new Device();
-        device.setDeviceAlias(deviceAlias);
+        device.setDeviceAlias(devicealias);
 
         // stop gap - sets all new generated devices sensortype to "dht"
         device.setSensorType("dht");
