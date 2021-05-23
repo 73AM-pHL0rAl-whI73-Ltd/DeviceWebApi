@@ -1,6 +1,7 @@
 package com.example.devicewebapi.DAO;
 
 
+import com.example.devicewebapi.models.Device;
 import com.example.devicewebapi.models.DeviceMessage;
 import com.example.devicewebapi.models.DhtMessage;
 import lombok.AllArgsConstructor;
@@ -69,6 +70,29 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
         return jdbcTemplate.query(query,
                 (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
                 deviceIdMaybe.get()
+        );
+    }
+
+    @Override
+    public List<DhtMessage> getLatestDeviceMeasurements(Device device, int amount) {
+
+
+        var id = devicePostgresDAO
+                .getDhtDeviceIdByAlias(device.getDeviceAlias()).
+                        orElse(
+                                devicePostgresDAO.
+                                        getDhtDeviceIdByUUID(device.getDeviceId()).
+                                        get()
+                        );
+        if(id == null) return null;
+
+        String query = "SELECT * FROM DhtMessages WHERE deviceId = ? " +
+                        "ORDER BY timeStamp LIMIT ?";
+
+        return jdbcTemplate.query(query,
+                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
+                id,
+                amount
         );
     }
 }
