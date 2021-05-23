@@ -24,6 +24,9 @@ public class DeviceController {
         var device = new Device();
         device.setDeviceAlias(deviceAlias);
 
+        // stop gap - sets all new generated devices sensortype to "dht"
+        device.setSensorType("dht");
+
         // add device, DAO generates new UUID for device
         return deviceService.generateNewDeviceFromAlias(device);
     }

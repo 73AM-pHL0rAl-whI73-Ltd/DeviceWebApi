@@ -22,7 +22,7 @@ public class DevicePostgresDAO implements IDeviceDAO {
 
     //TODO: Check if this works?
     @Override
-    public void addDevice(Device device) {
+    public Boolean addDevice(Device device) {
         String query;
 
         int deviceInfoId;
@@ -76,18 +76,20 @@ public class DevicePostgresDAO implements IDeviceDAO {
             jdbcTemplate.update(query,
                     sensorId,
                     deviceInfoId);
-        }
 
+            return true; // new device added
+        }
+        return false; // device already exists
     }
     // TODO: Implement this:
     @Override
     public Device getDeviceById(UUID id) {
-        String query = "SELECT * FROM " +
+        String query = "SELECT deviceinfo.\"deviceId\", deviceinfo.\"deviceAlias\", deviceinfo.\"macAddress\", sensortypes.\"sensorType\" FROM (" +
                 "\"Devices\" devices " +
                 "INNER JOIN  " +
                 "\"DeviceInfo\" deviceinfo on devices.\"deviceInfoId\" = deviceinfo.id " +
                 "INNER JOIN " +
-                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id " +
+                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id) " +
                 "WHERE \"deviceId\" = ?";
 
         return jdbcTemplate.query(
@@ -108,11 +110,11 @@ public class DevicePostgresDAO implements IDeviceDAO {
     @Override
     public Device getDeviceByAlias(String alias) {
         String query = "SELECT * FROM " +
-                "\"Devices\" devices " +
+                "(\"Devices\" devices " +
                 "INNER JOIN  " +
                 "\"DeviceInfo\" deviceinfo on devices.\"deviceInfoId\" = deviceinfo.id " +
                 "INNER JOIN " +
-                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id " +
+                "\"SensorTypes\" sensortypes on devices.\"sensorType\" = sensortypes.id) " +
                 "WHERE \"deviceAlias\" = ?";
 
         return jdbcTemplate.query(
@@ -181,7 +183,7 @@ public class DevicePostgresDAO implements IDeviceDAO {
 
     private Optional<Integer> getDeviceId(int deviceInfoId, int sensorTypeId) {
         String query = "SELECT id FROM \"Devices\" WHERE " +
-                "\"sensorType\" = ? AND \"deviceInfoId\" = ?";
+                " \"sensorType\" = ? AND \"deviceInfoId\" = ?";
 
         return Optional.ofNullable(jdbcTemplate.query(
                 query,
@@ -196,32 +198,50 @@ public class DevicePostgresDAO implements IDeviceDAO {
 
     public Optional<Integer> getDhtDeviceIdByUUID(UUID messageDeviceId) {
         // TODO: Refactor DevicePostgresDAO method parameters instead?
+
         // to hold values
-        var device = new Device();
-        device.setDeviceId(messageDeviceId);
-        device.setSensorType("dht");
+        var device = getDeviceById(messageDeviceId);
 
         var deviceInfoIdMaybe = getDeviceInfoId(device);
         var deviceSensorTypeIdMaybe = getSensorTypeId(device);
 
         if(deviceInfoIdMaybe.isPresent() & deviceSensorTypeIdMaybe.isPresent())
-            return getDeviceId(deviceSensorTypeIdMaybe.get(), deviceInfoIdMaybe.get());
+            return getDeviceId(deviceInfoIdMaybe.get(), deviceSensorTypeIdMaybe.get());
         else
             return Optional.empty();
+
     }
     public Optional<Integer> getDhtDeviceIdByAlias(String alias) {
         // TODO: Refactor DevicePostgresDAO method parameters instead?
+
         // to hold values
-        var device = new Device();
-        device.setDeviceAlias(alias);
+        var device = getDeviceByAlias(alias);
         device.setSensorType("dht");
 
         var deviceInfoIdMaybe = getDeviceInfoId(device);
         var deviceSensorTypeIdMaybe = getSensorTypeId(device);
 
         if(deviceInfoIdMaybe.isPresent() & deviceSensorTypeIdMaybe.isPresent())
-            return getDeviceId(deviceSensorTypeIdMaybe.get(), deviceInfoIdMaybe.get());
+            // wrong order
+            return getDeviceId( deviceInfoIdMaybe.get(),deviceSensorTypeIdMaybe.get());
         else
             return Optional.empty();
+
+    }
+    public UUID getDeviceUUIDFromDeviceId(int deviceId) {
+        String query = "SELECT * FROM " +
+                "(\"Devices\" devices " +
+                "INNER JOIN  " +
+                "\"DeviceInfo\" deviceinfo on devices.\"deviceInfoId\" = deviceinfo.id) " +
+                "WHERE devices.id = ?";
+
+        return jdbcTemplate.query(
+                query,
+                (resultSet) -> {
+                    if(!resultSet.next()) return null;
+                    return resultSet.getObject("deviceId", UUID.class);
+                },
+                deviceId
+        );
     }
 }

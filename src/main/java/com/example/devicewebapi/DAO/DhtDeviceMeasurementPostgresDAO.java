@@ -26,10 +26,12 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
         //TODO: Fix query to JOIN deviceId from DeviceInfo table.
         var deviceIdMaybe = devicePostgresDAO.getDhtDeviceIdByUUID(measurement.getDeviceId());
 
-        if(deviceIdMaybe.isEmpty()) return;
+        if(deviceIdMaybe.isEmpty())
+            return;
 
-        String query = "INSERT INTO DhtMessages " +
-                "(temperature, humidity, timeStamp, ) " +
+
+        String query = "INSERT INTO \"DhtMessages\" " +
+                "(temperature, humidity, \"timeStamp\", \"deviceId\" ) " +
                 "VALUES (?, ? , ?, ? )";
 
         // execute query
@@ -43,18 +45,32 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
 
     @Override
     public List<DhtMessage> getAllDeviceMeasurements() {
-        String query = "SELECT * FROM DhtMessages";
+        String query = "SELECT * FROM \"DhtMessages\"";;
 
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet)
+                (resultSet, index) ->  {
+                    return new DhtMessage(
+                            resultSet.getDouble("temperature"),
+                            resultSet.getDouble("humidity"),
+                            resultSet.getLong("timeStamp"),
+                            devicePostgresDAO.getDeviceUUIDFromDeviceId(resultSet.getInt("deviceId"))
+                    );
+                }
         );
     }
 
     @Override
     public List<DhtMessage> getLatestMeasurements(int top){
-        String query = "SELECT * FROM DhtMessages ORDER BY timeStamp LIMIT ?";
+        String query = "SELECT * FROM \"DhtMessages\" ORDER BY \"timeStamp\" LIMIT ?";
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
+                (resultSet, index) ->{
+                    return new DhtMessage(
+                            resultSet.getDouble("temperature"),
+                            resultSet.getDouble("humidity"),
+                            resultSet.getLong("timeStamp"),
+                            devicePostgresDAO.getDeviceUUIDFromDeviceId(resultSet.getInt("deviceId"))
+                    );
+                },
                 top
         );
     }
@@ -65,10 +81,17 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
 
         if(deviceIdMaybe.isEmpty()) return null;
 
-        String query = "SELECT * FROM DhtMessages WHERE deviceId = ?";
+        String query = "SELECT * FROM \"DhtMessages\" WHERE \"deviceId\" = ?";
 
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
+                (resultSet, index) -> {
+                    return new DhtMessage(
+                            resultSet.getDouble("temperature"),
+                            resultSet.getDouble("humidity"),
+                            resultSet.getLong("timeStamp"),
+                            devicePostgresDAO.getDeviceUUIDFromDeviceId(resultSet.getInt("deviceId"))
+                    );
+                },
                 deviceIdMaybe.get()
         );
     }
@@ -76,21 +99,25 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
     @Override
     public List<DhtMessage> getLatestDeviceMeasurements(Device device, int amount) {
 
+        int id;
 
-        var id = devicePostgresDAO
-                .getDhtDeviceIdByAlias(device.getDeviceAlias()).
-                        orElse(
-                                devicePostgresDAO.
-                                        getDhtDeviceIdByUUID(device.getDeviceId()).
-                                        get()
-                        );
-        if(id == null) return null;
+        if(device.getDeviceAlias() != null)
+            id = devicePostgresDAO.getDhtDeviceIdByAlias(device.getDeviceAlias()).orElse(-1);
+        else
+            id = devicePostgresDAO.getDhtDeviceIdByUUID(device.getDeviceId()).orElse(-1);
 
-        String query = "SELECT * FROM DhtMessages WHERE deviceId = ? " +
-                        "ORDER BY timeStamp LIMIT ?";
+        String query = "SELECT * FROM \"DhtMessages\" WHERE \"deviceId\" = ? " +
+                        "ORDER BY \"timeStamp\" LIMIT ?";
 
         return jdbcTemplate.query(query,
-                (resultSet, index) -> DhtMessage.DhtMessageFromResultSet(resultSet),
+                (resultSet, index) -> {
+                    return new DhtMessage(
+                            resultSet.getDouble("temperature"),
+                            resultSet.getDouble("humidity"),
+                            resultSet.getLong("timeStamp"),
+                            devicePostgresDAO.getDeviceUUIDFromDeviceId(resultSet.getInt("deviceId"))
+                    );
+                },
                 id,
                 amount
         );

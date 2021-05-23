@@ -40,17 +40,17 @@ public class DeviceApiController {
     @GetMapping
     public List<DhtMessage> getAllMeasurements() {return deviceMeasurementService.getAllDeviceMeasurements();}
 
-    @GetMapping("/latest/")
+    @GetMapping("/latest")
     public List<DhtMessage> getLatestOneMeasurements() { return deviceMeasurementService.getLatestMeasurements(1);}
 
     @GetMapping("/latest/{top}")
     public List<DhtMessage> getLatestMeasurements(@PathVariable int top) { return deviceMeasurementService.getLatestMeasurements(top);}
 
-    @GetMapping("/latest/{alias}/{top}")
+    @GetMapping("/latest/alias/{alias}/{top}")
     public List<DhtMessage> getLatestMeasurementsByAlias(@PathVariable String alias, @PathVariable int top) {
         return deviceMeasurementService.getLatestMeasurementByAlias(alias, top);
     }
-    @GetMapping("/latest/{id}/{top}")
+    @GetMapping("/latest/id/{id}/{top}")
     public List<DhtMessage> getLatestMeasurementsById(@PathVariable UUID id, @PathVariable int top) {
         return deviceMeasurementService.getLatestMeasurementById(id, top);
     }
