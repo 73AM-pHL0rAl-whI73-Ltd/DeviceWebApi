@@ -19,14 +19,14 @@ public interface IDeviceMeasurementDAO {
     List<DhtMessage> getMeasurementByDeviceId(UUID id);
 
 
-    List<DhtMessage> getLatestDeviceMeasurements(Device.DeviceBuilder device, int amount);
+    List<DhtMessage> getLatestDeviceMeasurements(Device device, int amount);
 
     default List<DhtMessage> getLatestMeasurementByAlias(String alias, int amount) {
 
-        return getLatestDeviceMeasurements(Device.builder().deviceAlias(alias), amount);
+        return getLatestDeviceMeasurements(Device.builder().deviceAlias(alias).build(), amount);
     }
     default List<DhtMessage> getLatestMeasurementById(UUID id, int amount) {
 
-        return getLatestDeviceMeasurements(Device.builder().deviceId(id), amount);
+        return getLatestDeviceMeasurements(Device.builder().deviceId(id).build(), amount);
     }
 }
