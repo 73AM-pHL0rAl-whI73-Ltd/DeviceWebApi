@@ -25,8 +25,12 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
     public void addDeviceMeasurement(DhtMessage measurement) {
         var deviceIdMaybe = devicePostgresDAO.getDhtDeviceIdByUUID(measurement.getDeviceId());
 
-        if(deviceIdMaybe.isEmpty())
+        if(deviceIdMaybe.isEmpty()) {
+            System.out.println("Returning");
             return;
+        }
+
+
 
 
         String query = "INSERT INTO \"DhtMessages\" " +
@@ -44,7 +48,7 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
 
     @Override
     public List<DhtMessage> getAllDeviceMeasurements() {
-        String query = "SELECT * FROM \"DhtMessages\"";;
+        String query = "SELECT * FROM \"DhtMessages\" ORDER BY \"timeStamp\" DESC";;
 
         return jdbcTemplate.query(query,
                 (resultSet, index) ->  {
@@ -60,7 +64,7 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
 
     @Override
     public List<DhtMessage> getLatestMeasurements(int top){
-        String query = "SELECT * FROM \"DhtMessages\" ORDER BY \"timeStamp\" LIMIT ?";
+        String query = "SELECT * FROM \"DhtMessages\" ORDER BY \"timeStamp\" DESC LIMIT ?";
         return jdbcTemplate.query(query,
                 (resultSet, index) ->{
                     return new DhtMessage(
@@ -80,7 +84,7 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
 
         if(deviceIdMaybe.isEmpty()) return null;
 
-        String query = "SELECT * FROM \"DhtMessages\" WHERE \"deviceId\" = ?";
+        String query = "SELECT * FROM \"DhtMessages\" WHERE \"deviceId\" = ? ORDER BY \"timeStamp\" DESC";
 
         return jdbcTemplate.query(query,
                 (resultSet, index) -> {
@@ -106,7 +110,7 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
             id = devicePostgresDAO.getDhtDeviceIdByUUID(device.getDeviceId()).orElse(-1);
 
         String query = "SELECT * FROM \"DhtMessages\" WHERE \"deviceId\" = ? " +
-                        "ORDER BY \"timeStamp\" LIMIT ?";
+                        "ORDER BY \"timeStamp\" DESC LIMIT ?";
 
         return jdbcTemplate.query(query,
                 (resultSet, index) -> {
