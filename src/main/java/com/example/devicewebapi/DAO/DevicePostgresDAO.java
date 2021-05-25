@@ -197,8 +197,6 @@ public class DevicePostgresDAO implements IDeviceDAO {
     }
 
     public Optional<Integer> getDhtDeviceIdByUUID(UUID messageDeviceId) {
-        // TODO: Refactor DevicePostgresDAO method parameters instead?
-
         // to hold values
         var device = getDeviceById(messageDeviceId);
 
@@ -212,8 +210,6 @@ public class DevicePostgresDAO implements IDeviceDAO {
 
     }
     public Optional<Integer> getDhtDeviceIdByAlias(String alias) {
-        // TODO: Refactor DevicePostgresDAO method parameters instead?
-
         // to hold values
         var device = getDeviceByAlias(alias);
         device.setSensorType("dht");

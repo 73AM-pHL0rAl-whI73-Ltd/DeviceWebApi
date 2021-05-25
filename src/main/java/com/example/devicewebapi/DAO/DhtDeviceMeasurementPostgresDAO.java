@@ -23,7 +23,6 @@ public class DhtDeviceMeasurementPostgresDAO implements IDeviceMeasurementDAO {
 
     @Override
     public void addDeviceMeasurement(DhtMessage measurement) {
-        //TODO: Fix query to JOIN deviceId from DeviceInfo table.
         var deviceIdMaybe = devicePostgresDAO.getDhtDeviceIdByUUID(measurement.getDeviceId());
 
         if(deviceIdMaybe.isEmpty())

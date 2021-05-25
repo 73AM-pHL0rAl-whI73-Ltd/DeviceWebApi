@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class DeviceMeasurementService {
+public class DhtMessageService {
 
         private final IDeviceMeasurementDAO iDeviceMeasurementDataAccess;
 
         @Autowired
-        public DeviceMeasurementService(@Qualifier("postgres") IDeviceMeasurementDAO iDeviceMeasurementDataAccess) {
+        public DhtMessageService(@Qualifier("postgres") IDeviceMeasurementDAO iDeviceMeasurementDataAccess) {
             this.iDeviceMeasurementDataAccess = iDeviceMeasurementDataAccess;
         }
 
