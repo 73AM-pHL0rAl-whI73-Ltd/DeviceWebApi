@@ -34,14 +34,14 @@ public class DevicePostgresDAO implements IDeviceDAO {
         // insert deviceinfo if it does not exist
         if(deviceInfoIdMaybe.isEmpty())
         {
-            deviceInfoId = generateDeviceInfoId(device);
+            deviceInfoId = insertDeviceInfoId(device);
         } else deviceInfoId = deviceInfoIdMaybe.get();
 
         // insert sensor type if it does not exist
         if(sensorTypeIdMaybe.isEmpty()) {
             query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
 
-            sensorId = generateSensorId(device);
+            sensorId = insertSensorId(device);
         } else sensorId = sensorTypeIdMaybe.get();
 
         // if there is a device present
@@ -218,7 +218,7 @@ public class DevicePostgresDAO implements IDeviceDAO {
                 deviceId
         );
     }
-    private int generateDeviceInfoId(Device device){
+    private int insertDeviceInfoId(Device device){
         String query =
                 "INSERT INTO \"DeviceInfo\" " +
                         "(\"deviceId\", \"deviceAlias\", \"macAddress\") " +
@@ -236,7 +236,7 @@ public class DevicePostgresDAO implements IDeviceDAO {
                         device.getMacAddress()});
         return deviceInfoId;
     }
-    private int generateSensorId(Device device){
+    private int insertSensorId(Device device){
         String query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
         var sensorId = jdbcTemplate.query(query,
                 (resultSet) -> {
