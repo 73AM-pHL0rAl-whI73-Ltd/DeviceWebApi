@@ -14,7 +14,7 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 @RequestMapping("measurements")
 @RestController
-public class DeviceApiController {
+public class DhtMessageController {
 
     private final DeviceMeasurementService deviceMeasurementService;
     // services webservice/dashboard
@@ -22,14 +22,13 @@ public class DeviceApiController {
     private final DeviceService deviceService;
 
     @Autowired
-    public DeviceApiController(DeviceMeasurementService deviceMeasurementService, DashboardService dashboardService, DeviceService deviceService) {
+    public DhtMessageController(DeviceMeasurementService deviceMeasurementService, DashboardService dashboardService, DeviceService deviceService) {
         this.deviceMeasurementService = deviceMeasurementService;
         this.dashboardService = dashboardService;
         this.deviceService = deviceService;
     }
     @PostMapping
     public void addDeviceMeasurement(@RequestBody DhtMessage message) {
-        // TODO : change return type of getDeviceById to Optional
         var device = deviceService.getDeviceById(message.getDeviceId());
         if(device == null) return; // do not add measurement if no device found
 
