@@ -20,13 +20,14 @@ class Device {
         float temperature, humidity;
 
         char message[250];
-        char deviceId[100];
+        char deviceId[150];
 
         unsigned long interval;
         unsigned long previous;
 
         void initWifi(char* SSID, char* password);
         void generatePayload();
+        bool isValidReadings();
 
     public:
         Device(char* deviceId, unsigned long interval);

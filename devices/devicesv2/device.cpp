@@ -18,15 +18,26 @@ void Device::init(char* url, char* SSID, char* password) {
 void Device::run() {
 
     if((millis() - this->previous) > this->interval){
-
+        
+        Serial.println("getting readings");
         this->sensor->getReadings(&(this->temperature), &(this->humidity));
+
+        if(!isValidReadings())
+            return;
+
+        Serial.println("generating payload");
         generatePayload();
 
+        Serial.println("posting message");
         this->client->postmessage(this->message);
 
+        Serial.println("updating timer");
         //updates delay timer.
         this->previous = millis();
     }
+}
+bool Device::isValidReadings() {
+    return !std::isnan(this->temperature) && !std::isnan(this->humidity);
 }
 
 void Device::initWifi(char* SSID, char* password) {
@@ -38,7 +49,7 @@ void Device::initWifi(char* SSID, char* password) {
         Serial.print(".");
     }
 
-    Serial.println("Connected to WiFi");
+    Serial.println("%nConnected to WiFi");
     Serial.println(WiFi.localIP());
 }
 void Device::generatePayload() {
@@ -48,4 +59,7 @@ void Device::generatePayload() {
   doc["timeStamp"] = time(NULL);
   doc["deviceId"] = this->deviceId;
   serializeJson(doc, this->message);
+
+  Serial.print("message: ");
+  Serial.println(this->message);
 }
