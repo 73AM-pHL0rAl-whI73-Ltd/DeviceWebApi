@@ -34,21 +34,14 @@ public class DevicePostgresDAO implements IDeviceDAO {
         // insert deviceinfo if it does not exist
         if(deviceInfoIdMaybe.isEmpty())
         {
-            query =
-                    "INSERT INTO \"DeviceInfo\" " +
-                            "(\"deviceId\", \"deviceAlias\", \"macAddress\") " +
-                            "VALUES (?, ? , ?) " +
-                            "ON CONFLICT DO NOTHING " +
-                            "RETURNING id";
-
-            deviceInfoId = generateDeviceInfoId(query, device);
+            deviceInfoId = generateDeviceInfoId(device);
         } else deviceInfoId = deviceInfoIdMaybe.get();
 
         // insert sensor type if it does not exist
         if(sensorTypeIdMaybe.isEmpty()) {
             query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
 
-            sensorId = generateSensorId(query, device);
+            sensorId = generateSensorId(device);
         } else sensorId = sensorTypeIdMaybe.get();
 
         // if there is a device present
@@ -225,7 +218,13 @@ public class DevicePostgresDAO implements IDeviceDAO {
                 deviceId
         );
     }
-    public int generateDeviceInfoId(String query, Device device){
+    private int generateDeviceInfoId(Device device){
+        String query =
+                "INSERT INTO \"DeviceInfo\" " +
+                        "(\"deviceId\", \"deviceAlias\", \"macAddress\") " +
+                        "VALUES (?, ? , ?) " +
+                        "ON CONFLICT DO NOTHING " +
+                        "RETURNING id";
         var deviceInfoId = jdbcTemplate.query(query,
                 (resultSet) -> {
                     resultSet.next();
@@ -237,7 +236,8 @@ public class DevicePostgresDAO implements IDeviceDAO {
                         device.getMacAddress()});
         return deviceInfoId;
     }
-    public int generateSensorId(String query, Device device){
+    private int generateSensorId(Device device){
+        String query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
         var sensorId = jdbcTemplate.query(query,
                 (resultSet) -> {
                     resultSet.next();
