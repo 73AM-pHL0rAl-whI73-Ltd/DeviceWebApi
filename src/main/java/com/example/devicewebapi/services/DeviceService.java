@@ -17,7 +17,7 @@ public class DeviceService {
     public DeviceService(@Qualifier("devicepostgres") IDeviceDAO iDeviceDAO ) {
         this.iDeviceDAO = iDeviceDAO;
     }
-    
+
     public Device generateNewDeviceFromAlias(Device device) {return iDeviceDAO.generateNewDeviceFromAlias(device);}
 
     public Device getDeviceById(UUID id) { return iDeviceDAO.getDeviceById(id);}
