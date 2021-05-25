@@ -20,20 +20,11 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     @PostMapping("/new/{devicealias}") // generate new device for webservice client
-    public Device generateDevice(@PathVariable String devicealias, HttpServletResponse response) {
-
-        // let javascript access response
-        response.setHeader("Access-Control-Allow-Origin", "*");
-
-        //create empty device and set Alias
-        var device = new Device();
-        device.setDeviceAlias(devicealias);
-
-        // stop gap - sets all new generated devices sensortype to "dht"
-        device.setSensorType("dht");
-
-        // add device, DAO generates new UUID for device
-        return deviceService.generateNewDeviceFromAlias(device);
+    public Device generateDevice(@PathVariable String devicealias) {
+        /*create empty device and set Alias
+        stop gap - sets all new generated devices sensortype to "dht"
+        add device, DAO generates new UUID for device*/
+        return deviceService.generateNewDeviceFromAlias(Device.builder().deviceAlias(devicealias).sensorType("dht").build());
     }
 
     @GetMapping
