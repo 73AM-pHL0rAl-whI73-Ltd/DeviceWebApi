@@ -20,7 +20,6 @@ public class DevicePostgresDAO implements IDeviceDAO {
     @Autowired
     private final JdbcTemplate jdbcTemplate;
 
-    //TODO: Check if this works?
     @Override
     public Boolean addDevice(Device device) {
         String query;
@@ -42,28 +41,14 @@ public class DevicePostgresDAO implements IDeviceDAO {
                             "ON CONFLICT DO NOTHING " +
                             "RETURNING id";
 
-            deviceInfoId = jdbcTemplate.query(query,
-                    (resultSet) -> {
-                        resultSet.next();
-                        return resultSet.getInt("Id");
-                    },
-                    new Object[]{
-                            device.getDeviceId(),
-                            device.getDeviceAlias(),
-                            device.getMacAddress()});
+            deviceInfoId = generateDeviceInfoId(query, device);
         } else deviceInfoId = deviceInfoIdMaybe.get();
 
         // insert sensor type if it does not exist
         if(sensorTypeIdMaybe.isEmpty()) {
             query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
 
-            sensorId = jdbcTemplate.query(query,
-                    (resultSet) -> {
-                        resultSet.next();
-                        return resultSet.getInt("Id");
-                    },
-                    new Object[]{
-                            device.getSensorType()});
+            sensorId = generateSensorId(query, device);
         } else sensorId = sensorTypeIdMaybe.get();
 
         // if there is a device present
@@ -239,5 +224,27 @@ public class DevicePostgresDAO implements IDeviceDAO {
                 },
                 deviceId
         );
+    }
+    public int generateDeviceInfoId(String query, Device device){
+        var deviceInfoId = jdbcTemplate.query(query,
+                (resultSet) -> {
+                    resultSet.next();
+                    return resultSet.getInt("Id");
+                },
+                new Object[]{
+                        device.getDeviceId(),
+                        device.getDeviceAlias(),
+                        device.getMacAddress()});
+        return deviceInfoId;
+    }
+    public int generateSensorId(String query, Device device){
+        var sensorId = jdbcTemplate.query(query,
+                (resultSet) -> {
+                    resultSet.next();
+                    return resultSet.getInt("Id");
+                },
+                new Object[]{
+                        device.getSensorType()});
+        return sensorId;
     }
 }
