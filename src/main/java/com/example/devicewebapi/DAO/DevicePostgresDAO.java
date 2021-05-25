@@ -39,8 +39,6 @@ public class DevicePostgresDAO implements IDeviceDAO {
 
         // insert sensor type if it does not exist
         if(sensorTypeIdMaybe.isEmpty()) {
-            query = "INSERT INTO \"SensorTypes\" (\"sensorType\") VALUES (?) RETURNING id";
-
             sensorId = insertSensorId(device);
         } else sensorId = sensorTypeIdMaybe.get();
 
