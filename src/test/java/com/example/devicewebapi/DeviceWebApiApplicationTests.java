@@ -13,8 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 class DeviceWebApiApplicationTests {
@@ -43,14 +41,14 @@ class DeviceWebApiApplicationTests {
     }
 
     @Test
-    public void test_GetLatest2()
+    public void test_GetLatest10()
             throws Exception {
 
         mvc.perform(MockMvcRequestBuilders
-                .get("/measurements/latest/2")
+                .get("/measurements/latest/10")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",hasSize(2)));
+                .andExpect(jsonPath("$",hasSize(10)));
     }
 
     @Test
@@ -60,7 +58,8 @@ class DeviceWebApiApplicationTests {
         mvc.perform(MockMvcRequestBuilders
                 .get("/measurements/device/testdevice0")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",hasSize(1)));
     }
 
     @Test
@@ -72,6 +71,20 @@ class DeviceWebApiApplicationTests {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].deviceId").isString())
+                .andExpect(jsonPath("$[0].timeStamp").isNumber())
+                .andExpect(jsonPath("$[0].temperature").isNumber())
+                .andExpect(jsonPath("$[0].humidity").isNumber());
+    }
+
+    @Test
+    public void test_ValidJsonResponseForDevice()
+            throws Exception {
+
+        mvc.perform(MockMvcRequestBuilders
+                .get("/measurements/device/testdevice0")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].deviceId").value("testdevice0"))
                 .andExpect(jsonPath("$[0].timeStamp").isNumber())
                 .andExpect(jsonPath("$[0].temperature").isNumber())
                 .andExpect(jsonPath("$[0].humidity").isNumber());
